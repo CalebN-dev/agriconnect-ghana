@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriConnect GHANA - Digital Agriculture Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4B4BC8',
+                        'bg-light': '#FFFFFF',
+                        'bg-dark': '#181818',
+                        'green-ghana': '#006B3C',
+                        'gold-ghana': '#FCD116',
+                        'red-ghana': '#CE1126'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .crop-card:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-bg-light dark:bg-bg-dark min-h-screen transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="w-8 h-8 bg-green-ghana rounded-full mr-2"></div>
+                        <span class="text-xl font-bold text-gray-800 dark:text-white">AgriConnect Ghana</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#dashboard" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary">Dashboard</a>
+                    <a href="#marketplace" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary">Marketplace</a>
+                    <a href="#weather" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary">Weather</a>
+                    <a href="#knowledge" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary">Knowledge Hub</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="loginBtn" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-base">
+                        Login
+                    </button>
+                    <button id="signupBtn" class="border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-md text-base">
+                        Sign Up
+                    </button>
+                    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-base hidden">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="bg-gradient-to-r from-green-ghana to-gold-ghana text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                    Empowering Ghanaian Farmers
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 opacity-90">
+                    Connect, Trade, and Grow with Digital Agriculture Solutions
+                </p>
+                <button id="getStartedBtn" class="bg-white text-green-ghana px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
+                    Get Started Today
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Authentication Modal -->
+        <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
+                <h2 id="modalTitle" class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Login</h2>
+                
+                <form id="authForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            User Type
+                        </label>
+                        <select id="userType" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="farmer">Farmer</option>
+                            <option value="buyer">Buyer</option>
+                            <option value="expert">Agricultural Expert</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Email
+                        </label>
+                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Password
+                        </label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <button type="button" id="closeModal" class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                            Cancel
+                        </button>
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-md">
+                            <span id="submitText">Login</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="mb-12 hidden">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-8">Dashboard</h2>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
+                            🌱
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Active Crops</h3>
+                            <p class="text-2xl font-bold text-green-500" id="activeCrops">12</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">
+                            💰
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Total Sales</h3>
+                            <p class="text-2xl font-bold text-blue-500" id="totalSales">₵2,450</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xl">
+                            📦
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Pending Orders</h3>
+                            <p class="text-2xl font-bold text-yellow-500" id="pendingOrders">5</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weather Section -->
+        <section id="weather" class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-8">Weather Information</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Current Weather -->
+                <div class="weather-card p-6 rounded-lg shadow-md text-white">
+                    <h3 class="text-xl font-semibold mb-4">Current Weather - Accra</h3>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-3xl font-bold" id="currentTemp">28°C</p>
+                            <p class="text-lg" id="currentCondition">Partly Cloudy</p>
+                            <p class="text-sm opacity-80" id="humidity">Humidity: 65%</p>
+                        </div>
+                        <div class="text-6xl">☁️</div>
+                    </div>
+                </div>
+                
+                <!-- Weather Forecast -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">7-Day Forecast</h3>
+                    <div id="forecast" class="space-y-2">
+                        <!-- Forecast items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Weather Alerts -->
+            <div class="mt-6 bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 rounded">
+                <div class="flex">
+                    <div class="text-yellow-400 text-xl mr-3">⚠️</div>
+                    <div>
+                        <h4 class="text-yellow-800 dark:text-yellow-200 font-semibold">Weather Alert</h4>
+                        <p class="text-yellow-700 dark:text-yellow-300">Heavy rainfall expected in the next 48 hours. Protect your crops and ensure proper drainage.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marketplace Section -->
+        <section id="marketplace" class="mb-12">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Marketplace</h2>
+                <button id="addCropBtn" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg">
+                    + Add Crop Listing
+                </button>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="searchCrops" placeholder="Search crops..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary">
+                    <select id="cropCategory" class="px-4 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">All Categories</option>
+                        <option value="grains">Grains</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="fruits">Fruits</option>
+                        <option value="roots">Root Crops</option>
+                    </select>
+                    <select id="regionFilter" class="px-4 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">All Regions</option>
+                        <option value="greater-accra">Greater Accra</option>
+                        <option value="ashanti">Ashanti</option>
+                        <option value="northern">Northern</option>
+                        <option value="volta">Volta</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Crop Listings Grid -->
+            <div id="cropListings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Crop listings will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Add/Edit Crop Modal -->
+        <div id="cropModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full mx-4 max-h-screen overflow-y-auto">
+                <h2 id="cropModalTitle" class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Add Crop Listing</h2>
+                
+                <form id="cropForm">
+                    <input type="hidden" id="cropId">
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Crop Name
+                        </label>
+                        <input type="text" id="cropName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Category
+                        </label>
+                        <select id="cropCategorySelect" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            <option value="">Select Category</option>
+                            <option value="grains">Grains</option>
+                            <option value="vegetables">Vegetables</option>
+                            <option value="fruits">Fruits</option>
+                            <option value="roots">Root Crops</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Quantity (kg)
+                        </label>
+                        <input type="number" id="cropQuantity" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Price per kg (₵)
+                        </label>
+                        <input type="number" id="cropPrice" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Region
+                        </label>
+                        <select id="cropRegion" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            <option value="">Select Region</option>
+                            <option value="greater-accra">Greater Accra</option>
+                            <option value="ashanti">Ashanti</option>
+                            <option value="northern">Northern</option>
+                            <option value="volta">Volta</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Description
+                        </label>
+                        <textarea id="cropDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <button type="button" id="closeCropModal" class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                            Cancel
+                        </button>
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-md">
+                            Save Listing
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Knowledge Hub Section -->
+        <section id="knowledge" class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-8">Knowledge Hub</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Agricultural Tips -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">🌾 Farming Tips</h3>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                        <li>• Best planting times for cocoa</li>
+                        <li>• Soil preparation techniques</li>
+                        <li>• Organic pest control methods</li>
+                        <li>• Water conservation strategies</li>
+                    </ul>
+                    <button class="mt-4 text-primary hover:text-primary-dark font-semibold">Read More →</button>
+                </div>
+                
+                <!-- Market Insights -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">📊 Market Insights</h3>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                        <li>• Current cassava prices trending up</li>
+                        <li>• High demand for organic tomatoes</li>
+                        <li>• Export opportunities for palm oil</li>
+                        <li>• Seasonal price predictions</li>
+                    </ul>
+                    <button class="mt-4 text-primary hover:text-primary-dark font-semibold">View Reports →</button>
+                </div>
+                
+                <!-- Expert Advice -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">👨‍🌾 Expert Advice</h3>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                        <li>• Disease prevention strategies</li>
+                        <li>• Crop rotation benefits</li>
+                        <li>• Modern farming techniques</li>
+                        <li>• Financial planning for farmers</li>
+                    </ul>
+                    <button class="mt-4 text-primary hover:text-primary-dark font-semibold">Consult Expert →</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">AgriConnect Ghana</h3>
+                    <p class="text-gray-400">Empowering Ghanaian farmers with digital solutions for sustainable agriculture.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">About Us</a></li>
+                        <li><a href="#" class="hover:text-white">Contact</a></li>
+                        <li><a href="#" class="hover:text-white">Support</a></li>
+                        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact Info</h3>
+                    <p class="text-gray-400">📞 +233 XX XXX XXXX</p>
+                    <p class="text-gray-400">✉️ info@agriconnect.gh</p>
+                    <p class="text-gray-400">📍 Accra, Ghana</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 AgriConnect Ghana. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Global state
+        let currentUser = null;
+        let crops = [
+            {
+                id: 1,
+                name: "Cassava",
+                category: "roots",
+                quantity: 500,
+                price: 2.50,
+                region: "greater-accra",
+                description: "Fresh cassava harvested this week",
+                farmer: "Kwame Asante",
+                contact: "+233 XX XXX XXXX"
+            },
+            {
+                id: 2,
+                name: "Tomatoes",
+                category: "vegetables",
+                quantity: 200,
+                price: 4.00,
+                region: "ashanti",
+                description: "Organic tomatoes, perfect for market",
+                farmer: "Ama Serwaa",
+                contact: "+233 XX XXX XXXX"
+            },
+            {
+                id: 3,
+                name: "Maize",
+                category: "grains",
+                quantity: 1000,
+                price: 3.20,
+                region: "northern",
+                description: "High quality maize, suitable for export",
+                farmer: "Ibrahim Mohammed",
+                contact: "+233 XX XXX XXXX"
+            }
+        ];
+
+        // Weather data (mock)
+        const weatherData = {
+            current: {
+                temperature: 28,
+                condition: "Partly Cloudy",
+                humidity: 65,
+                icon: "☁️"
+            },
+            forecast: [
+                { day: "Today", high: 30, low: 22, icon: "☁️" },
+                { day: "Tomorrow", high: 32, low: 24, icon: "☀️" },
+                { day: "Wednesday", high: 28, low: 20, icon: "🌧️" },
+                { day: "Thursday", high: 31, low: 23, icon: "☀️" },
+                { day: "Friday", high: 29, low: 21, icon: "⛅" },
+                { day: "Saturday", high: 33, low: 25, icon: "☀️" },
+                { day: "Sunday", high: 27, low: 19, icon: "🌧️" }
+            ]
+        };
+
+        // DOM elements
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authModal = document.getElementById('authModal');
+        const authForm = document.getElementById('authForm');
+        const closeModal = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const submitText = document.getElementById('submitText');
+        const dashboard = document.getElementById('dashboard');
+        const addCropBtn = document.getElementById('addCropBtn');
+        const cropModal = document.getElementById('cropModal');
+        const cropForm = document.getElementById('cropForm');
+        const closeCropModal = document.getElementById('closeCropModal');
+
+        // Event listeners
+        loginBtn.addEventListener('click', () => openAuthModal('login'));
+        signupBtn.addEventListener('click', () => openAuthModal('signup'));
+        logoutBtn.addEventListener('click', logout);
+        closeModal.addEventListener('click', () => authModal.classList.add('hidden'));
+        authForm.addEventListener('submit', handleAuth);
+        addCropBtn.addEventListener('click', () => openCropModal());
+        closeCropModal.addEventListener('click', () => cropModal.classList.add('hidden'));
+        cropForm.addEventListener('submit', handleCropSubmit);
+
+        // Search and filter functionality
+        document.getElementById('searchCrops').addEventListener('input', filterCrops);
+        document.getElementById('cropCategory').addEventListener('change', filterCrops);
+        document.getElementById('regionFilter').addEventListener('change', filterCrops);
+
+        // Authentication functions
+        function openAuthModal(type) {
+            authModal.classList.remove('hidden');
+            if (type === 'login') {
+                modalTitle.textContent = 'Login';
+                submitText.textContent = 'Login';
+            } else {
+                modalTitle.textContent = 'Sign Up';
+                submitText.textContent = 'Sign Up';
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const userType = document.getElementById('userType').value;
+            
+            // Mock authentication - in real app, this would call an API
+            currentUser = {
+                email: email,
+                userType: userType,
+                name: email.split('@')[0]
+            };
+            
+            // Update UI
+            loginBtn.classList.add('hidden');
+            signupBtn.classList.add('hidden');
+            logoutBtn.classList.remove('hidden');
+            dashboard.classList.remove('hidden');
+            authModal.classList.add('hidden');
+            
+            // Reset form
+            authForm.reset();
+            
+            showAlert('Welcome to AgriConnect Ghana!', 'success');
+        }
+
+        function logout() {
+            currentUser = null;
+            loginBtn.classList.remove('hidden');
+            signupBtn.classList.remove('hidden');
+            logoutBtn.classList.add('hidden');
+            dashboard.classList.add('hidden');
+            showAlert('Logged out successfully', 'info');
+        }
+
+        // Crop management functions
+        function openCropModal(cropId = null) {
+            if (!currentUser) {
+                showAlert('Please login to add crop listings', 'warning');
+                return;
+            }
+            
+            cropModal.classList.remove('hidden');
+            
+            if (cropId) {
+                const crop = crops.find(c => c.id === cropId);
+                if (crop) {
+                    document.getElementById('cropModalTitle').textContent = 'Edit Crop Listing';
+                    document.getElementById('cropId').value = crop.id;
+                    document.getElementById('cropName').value = crop.name;
+                    document.getElementById('cropCategorySelect').value = crop.category;
+                    document.getElementById('cropQuantity').value = crop.quantity;
+                    document.getElementById('cropPrice').value = crop.price;
+                    document.getElementById('cropRegion').value = crop.region;
+                    document.getElementById('cropDescription').value = crop.description;
+                }
+            } else {
+                document.getElementById('cropModalTitle').textContent = 'Add Crop Listing';
+                cropForm.reset();
+            }
+        }
+
+        function handleCropSubmit(e) {
+            e.preventDefault();
+            
+            const cropData = {
+                name: document.getElementById('cropName').value,
+                category: document.getElementById('cropCategorySelect').value,
+                quantity: parseInt(document.getElementById('cropQuantity').value),
+                price: parseFloat(document.getElementById('cropPrice').value),
+                region: document.getElementById('cropRegion').value,
+                description: document.getElementById('cropDescription').value,
+                farmer: currentUser.name,
+                contact: "+233 XX XXX XXXX"
+            };
+            
+            const cropId = document.getElementById('cropId').value;
+            
+            if (cropId) {
+                // Update existing crop
+                const index = crops.findIndex(c => c.id === parseInt(cropId));
+                crops[index] = { ...crops[index], ...cropData };
+                showAlert('Crop listing updated successfully!', 'success');
+            } else {
+                // Add new crop
+                cropData.id = Date.now();
+                crops.unshift(cropData);
+                showAlert('Crop listing added successfully!', 'success');
+            }
+            
+            renderCrops();
+            cropModal.classList.add('hidden');
+            cropForm.reset();
+        }
+
+        function deleteCrop(cropId) {
+            showConfirmDialog('Are you sure you want to delete this crop listing?', () => {
+                crops = crops.filter(c => c.id !== cropId);
+                renderCrops();
+                showAlert('Crop listing deleted successfully!', 'success');
+            });
+        }
+
+        function filterCrops() {
+            const searchTerm = document.getElementById('searchCrops').value.toLowerCase();
+            const category = document.getElementById('cropCategory').value;
+            const region = document.getElementById('regionFilter').value;
+            
+            const filteredCrops = crops.filter(crop => {
+                const matchesSearch = crop.name.toLowerCase().includes(searchTerm) || 
+                                    crop.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = !category || crop.category === category;
+                const matchesRegion = !region || crop.region === region;
+                
+                return matchesSearch && matchesCategory && matchesRegion;
+            });
+            
+            renderCrops(filteredCrops);
+        }
+
+        function renderCrops(cropsToRender = crops) {
+            const cropListings = document.getElementById('cropListings');
+            
+            if (cropsToRender.length === 0) {
+                cropListings.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="text-6xl mb-4">🌾</div>
+                        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No crops found</h3>
+                        <p class="text-gray-500 dark:text-gray-500">Try adjusting your search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            cropListings.innerHTML = cropsToRender.map(crop => `
+                <div class="crop-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">${crop.name}</h3>
+                            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full text-sm">
+                                ${crop.category}
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                <span class="font-semibold">Quantity:</span> ${crop.quantity} kg
+                            </p>
+                            <p class="text-gray-600 dark:text-gray-400">
+                                <span class="font-semibold">Price:</span> ₵${crop.price}/kg
+                            </p>
+                            <p class="text-gray-600 dark:text-gray-400">
+                                <span class="font-semibold">Region:</span> ${crop.region.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </p>
+                            <p class="text-gray-600 dark:text-gray-400">
+                                <span class="font-semibold">Farmer:</span> ${crop.farmer}
+                            </p>
+                        </div>
+                        
+                        ${crop.description ? `<p class="text-gray-600 dark:text-gray-400 mb-4">${crop.description}</p>` : ''}
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-primary">₵${(crop.quantity * crop.price).toFixed(2)}</span>
+                            <div class="space-x-2">
+                                ${currentUser && currentUser.name === crop.farmer ? `
+                                    <button onclick="openCropModal(${crop.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                                        Edit
+                                    </button>
+                                    <button onclick="deleteCrop(${crop.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                        Delete
+                                    </button>
+                                ` : `
+                                    <button onclick="contactFarmer('${crop.farmer}', '${crop.contact}')" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded">
+                                        Contact
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function contactFarmer(farmerName, contact) {
+            showAlert(`Contact ${farmerName} at ${contact}`, 'info');
+        }
+
+        // Weather functions
+        function loadWeather() {
+            // Update current weather
+            document.getElementById('currentTemp').textContent = `${weatherData.current.temperature}°C`;
+            document.getElementById('currentCondition').textContent = weatherData.current.condition;
+            document.getElementById('humidity').textContent = `Humidity: ${weatherData.current.humidity}%`;
+            
+            // Update forecast
+            const forecast = document.getElementById('forecast');
+            forecast.innerHTML = weatherData.forecast.map(day => `
+                <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+                    <span class="text-gray-800 dark:text-white font-medium">${day.day}</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">${day.icon}</span>
+                        <span class="text-gray-600 dark:text-gray-400">${day.high}°/${day.low}°</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Utility functions
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = `fixed top-4 right-4 z-50 max-w-sm w-full`;
+            
+            const bgColor = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'warning': 'bg-yellow-500',
+                'info': 'bg-blue-500'
+            }[type];
+            
+            alertContainer.innerHTML = `
+                <div class="${bgColor} text-white px-6 py-4 rounded-lg shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <span>${message}</span>
+                        <button onclick="this.closest('.fixed').remove()" class="ml-4 text-white hover:text-gray-200">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(alertContainer);
+            
+            setTimeout(() => {
+                alertContainer.remove();
+            }, 5000);
+        }
+
+        function showConfirmDialog(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">${message}</p>
+                    <div class="flex justify-end space-x-3">
+                        <button class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="this.closest('.fixed').remove()">Cancel</button>
+                        <button class="px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded" onclick="this.closest('.fixed').remove(); (${onConfirm})()">Confirm</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Initialize app
+        function initApp() {
+            renderCrops();
+            loadWeather();
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                // Update dashboard stats (simulate real data)
+                if (currentUser) {
+                    document.getElementById('activeCrops').textContent = crops.filter(c => c.farmer === currentUser.name).length;
+                    document.getElementById('totalSales').textContent = `₵${(Math.random() * 5000 + 2000).toFixed(0)}`;
+                    document.getElementById('pendingOrders').textContent = Math.floor(Math.random() * 10);
+                }
+            }, 10000);
+        }
+
+        // Start the application
+        initApp();
+    </script>
+</body>
+</html>
